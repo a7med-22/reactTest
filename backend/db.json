@@ -1,0 +1,101 @@
+{
+    "posts": [
+        {
+            "id": 1,
+            "title": "Getting Started with React: A Comprehensive Guide",
+            "content": "React is a powerful JavaScript library for building user interfaces. In this comprehensive guide, we'll explore the fundamentals of React, including components, state management, and modern React patterns. Whether you're a beginner or looking to refresh your knowledge, this post will provide valuable insights into building modern web applications with React.",
+            "excerpt": "Learn the fundamentals of React and build modern web applications with this comprehensive guide.",
+            "author": "Ahmed Mohamed",
+            "date": "2024-03-15",
+            "category": "Web Development",
+            "tags": [
+                "React",
+                "JavaScript",
+                "Frontend",
+                "Tutorial"
+            ],
+            "readTime": 8,
+            "image": "https://via.placeholder.com/800x400/61dafb/000000?text=React+Guide",
+            "likes": 142,
+            "comments": 23
+        },
+        {
+            "id": 2,
+            "title": "Building Responsive Design with CSS Grid and Flexbox",
+            "content": "Modern web design requires responsive layouts that work seamlessly across all devices. In this detailed tutorial, we'll dive deep into CSS Grid and Flexbox, two powerful layout systems that have revolutionized how we build responsive web interfaces. Learn when to use each, how to combine them effectively, and best practices for creating stunning layouts.",
+            "excerpt": "Master responsive design with CSS Grid and Flexbox in this comprehensive tutorial.",
+            "author": "Sarah Johnson",
+            "date": "2024-03-12",
+            "category": "CSS",
+            "tags": [
+                "CSS",
+                "Responsive Design",
+                "Grid",
+                "Flexbox"
+            ],
+            "readTime": 12,
+            "image": "https://via.placeholder.com/800x400/1572b6/ffffff?text=CSS+Grid+%26+Flexbox",
+            "likes": 89,
+            "comments": 15
+        },
+        {
+            "id": 3,
+            "title": "JavaScript ES6+ Features Every Developer Should Know",
+            "content": "JavaScript has evolved significantly with ES6 and beyond, introducing powerful features that make code more readable, maintainable, and efficient. This post covers essential ES6+ features including arrow functions, destructuring, modules, async/await, and more. Each feature is explained with practical examples and use cases.",
+            "excerpt": "Explore essential JavaScript ES6+ features with practical examples and real-world applications.",
+            "author": "Michael Chen",
+            "date": "2024-03-10",
+            "category": "JavaScript",
+            "tags": [
+                "JavaScript",
+                "ES6",
+                "Programming",
+                "Tutorial"
+            ],
+            "readTime": 10,
+            "image": "https://via.placeholder.com/800x400/f7df1e/000000?text=JavaScript+ES6%2B",
+            "likes": 256,
+            "comments": 31
+        },
+        {
+            "id": 4,
+            "title": "Node.js and Express: Building RESTful APIs",
+            "content": "Learn how to build robust RESTful APIs using Node.js and Express.js. This tutorial covers everything from setting up your development environment to implementing authentication, error handling, and database integration. We'll build a complete API from scratch and deploy it to the cloud.",
+            "excerpt": "Build robust RESTful APIs with Node.js and Express from setup to deployment.",
+            "author": "David Wilson",
+            "date": "2024-03-08",
+            "category": "Backend",
+            "tags": [
+                "Node.js",
+                "Express",
+                "API",
+                "Backend",
+                "REST"
+            ],
+            "readTime": 15,
+            "image": "https://via.placeholder.com/800x400/68a063/ffffff?text=Node.js+%26+Express",
+            "likes": 178,
+            "comments": 42
+        },
+        {
+            "id": 5,
+            "title": "Database Design Best Practices for Modern Applications",
+            "content": "Effective database design is crucial for building scalable and maintainable applications. This post explores fundamental principles of database design, normalization techniques, indexing strategies, and performance optimization. Learn how to design databases that can grow with your application and maintain excellent performance.",
+            "excerpt": "Learn database design principles and optimization techniques for scalable applications.",
+            "author": "Lisa Zhang",
+            "date": "2024-03-05",
+            "category": "Database",
+            "tags": [
+                "Database",
+                "SQL",
+                "Design",
+                "Performance",
+                "Optimization"
+            ],
+            "readTime": 18,
+            "image": "https://via.placeholder.com/800x400/336791/ffffff?text=Database+Design",
+            "likes": 134,
+            "comments": 28
+        }
+    ]
+}
