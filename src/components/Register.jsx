@@ -13,113 +13,128 @@ import {
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
-const Login = () => {
+const Register = () => {
   // Use useRef for form inputs
+  const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = () => {
-    // Clear error when user starts typing
     if (error) setError("");
+    if (success) setSuccess("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    setSuccess("");
 
     // Get values from refs
+    const name = nameRef.current.value;
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
+    const confirmPassword = confirmPasswordRef.current.value;
 
     // Simple validation
-    if (!email || !password) {
+    if (!name || !email || !password || !confirmPassword) {
       toast.error("Please fill in all fields");
       setIsLoading(false);
       return;
     }
-
     if (!email.includes("@")) {
       toast.error("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
     try {
       // Show loading toast
-      const loadingToast = toast.loading("Signing you in...");
+      const loadingToast = toast.loading("Checking user availability...");
 
-      // Fetch users from database
-      const usersResponse = await axios.get("http://localhost:3000/users");
-      const users = usersResponse.data;
+      // Check if user already exists
+      const existingUsersResponse = await axios.get(
+        "http://localhost:3000/users"
+      );
+      const existingUsers = existingUsersResponse.data;
 
-      // Check if user exists and verify credentials
-      // Note: In a real app, password would be hashed and verified on backend
-      const user = users.find((u) => u.email === email);
+      const userExists = existingUsers.find((user) => user.email === email);
 
-      // For demo purposes, we'll accept any password for existing users
-      // or the hardcoded admin credentials
-      const isValidLogin =
-        user || (email === "admin@example.com" && password === "admin123");
-
-      if (isValidLogin) {
-        // Use found user data or default admin data
-        const userData = user || {
-          id: 0,
-          name: "Admin User",
-          email: email,
-          role: "Admin",
-          status: "Active",
-        };
-
-        // Update last login if user exists in database
-        if (user) {
-          await axios.patch(`http://localhost:3000/users/${user.id}`, {
-            lastLogin: new Date().toISOString().split("T")[0],
-          });
-        }
-
-        // Store authentication status
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: userData.id,
-            email: userData.email,
-            name: userData.name,
-            role: userData.role,
-          })
-        );
-
-        // Dismiss loading toast and show success
+      if (userExists) {
         toast.dismiss(loadingToast);
-        toast.success(`Welcome back, ${userData.name}!`);
-
-        // Redirect to dashboard
-        navigate("/dashboard");
-      } else {
-        toast.dismiss(loadingToast);
-        toast.error(
-          "Invalid email or password. Please check your credentials or register a new account."
-        );
+        toast.error("User with this email already exists!");
+        setIsLoading(false);
+        return;
       }
+
+      // Update loading message
+      toast.update(loadingToast, { render: "Creating your account..." });
+
+      // Generate user ID
+      const newUserId =
+        existingUsers.length > 0
+          ? Math.max(...existingUsers.map((u) => u.id)) + 1
+          : 1;
+
+      // Create new user object
+      const newUser = {
+        id: newUserId,
+        name: name,
+        email: email,
+        password: password, // In real apps, hash the password before storing
+        role: "Author", // Default role for new users
+        status: "Active",
+        joined: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
+        posts: 0,
+        lastLogin: "Never",
+        avatar: `https://via.placeholder.com/100x100/007bff/ffffff?text=${name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()}`,
+        bio: "New user",
+        location: "Not specified",
+        phone: "Not specified",
+      };
+
+      // Add user to database
+      await axios.post("http://localhost:3000/users", newUser);
+
+      // Dismiss loading toast and show success
+      toast.dismiss(loadingToast);
+      toast.success("Registration successful! Redirecting to login...");
+
+      // Clear form
+      nameRef.current.value = "";
+      emailRef.current.value = "";
+      passwordRef.current.value = "";
+      confirmPasswordRef.current.value = "";
+
+      // Redirect to login after a delay
+      setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
       toast.error("An error occurred. Please try again.");
-      console.error("Login error:", error);
+      console.error("Register error:", error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    emailRef.current.value = "admin@example.com";
-    passwordRef.current.value = "admin123";
-    toast.info("Demo credentials loaded! Click 'Sign In' to login.");
   };
 
   return (
@@ -146,31 +161,19 @@ const Login = () => {
                     className="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
                     style={{ width: "60px", height: "60px" }}
                   >
-                    <i className="bi bi-person-lock text-white fs-3"></i>
+                    <i className="bi bi-person-plus text-white fs-3"></i>
                   </div>
-                  <h2 className="fw-bold text-dark mb-2">Welcome Back</h2>
-                  <p className="text-muted">Sign in to access your dashboard</p>
+                  <h2 className="fw-bold text-dark mb-2">Create Account</h2>
+                  <p className="text-muted">Sign up to access your dashboard</p>
                 </div>
 
-                {/* Demo Credentials Banner */}
-                <Alert variant="info" className="text-center mb-4">
-                  <small>
-                    <strong>Demo Credentials:</strong>
-                    <br />
-                    Email: admin@example.com
-                    <br />
-                    Password: admin123
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="p-0 ms-2"
-                      onClick={handleDemoLogin}
-                    >
-                      Use Demo
-                    </Button>
-                  </small>
-                </Alert>
-
+                {/* Success Alert */}
+                {success && (
+                  <Alert variant="success" className="mb-4">
+                    <i className="bi bi-check-circle me-2"></i>
+                    {success}
+                  </Alert>
+                )}
                 {/* Error Alert */}
                 {error && (
                   <Alert variant="danger" className="mb-4">
@@ -179,8 +182,25 @@ const Login = () => {
                   </Alert>
                 )}
 
-                {/* Login Form */}
+                {/* Register Form */}
                 <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-medium">Full Name</Form.Label>
+                    <InputGroup>
+                      <InputGroup.Text className="bg-light border-end-0">
+                        <i className="bi bi-person text-muted"></i>
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        name="name"
+                        placeholder="Enter your name"
+                        ref={nameRef}
+                        onChange={handleInputChange}
+                        className="border-start-0"
+                        style={{ boxShadow: "none" }}
+                      />
+                    </InputGroup>
+                  </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-medium">Email Address</Form.Label>
                     <InputGroup>
@@ -198,8 +218,7 @@ const Login = () => {
                       />
                     </InputGroup>
                   </Form.Group>
-
-                  <Form.Group className="mb-4">
+                  <Form.Group className="mb-3">
                     <Form.Label className="fw-medium">Password</Form.Label>
                     <InputGroup>
                       <InputGroup.Text className="bg-light border-end-0">
@@ -227,18 +246,25 @@ const Login = () => {
                       </InputGroup.Text>
                     </InputGroup>
                   </Form.Group>
-
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <Form.Check
-                      type="checkbox"
-                      label="Remember me"
-                      className="text-muted"
-                    />
-                    <Button variant="link" className="p-0 text-decoration-none">
-                      Forgot password?
-                    </Button>
-                  </div>
-
+                  <Form.Group className="mb-4">
+                    <Form.Label className="fw-medium">
+                      Confirm Password
+                    </Form.Label>
+                    <InputGroup>
+                      <InputGroup.Text className="bg-light border-end-0">
+                        <i className="bi bi-lock-fill text-muted"></i>
+                      </InputGroup.Text>
+                      <Form.Control
+                        type={showPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        placeholder="Confirm your password"
+                        ref={confirmPasswordRef}
+                        onChange={handleInputChange}
+                        className="border-start-0"
+                        style={{ boxShadow: "none" }}
+                      />
+                    </InputGroup>
+                  </Form.Group>
                   <Button
                     type="submit"
                     variant="primary"
@@ -252,31 +278,29 @@ const Login = () => {
                           className="spinner-border spinner-border-sm me-2"
                           role="status"
                         ></span>
-                        Signing in...
+                        Creating account...
                       </>
                     ) : (
                       <>
-                        <i className="bi bi-box-arrow-in-right me-2"></i>
-                        Sign In
+                        <i className="bi bi-person-plus me-2"></i>
+                        Register
                       </>
                     )}
                   </Button>
                 </Form>
-
                 {/* Footer */}
                 <div className="text-center mt-4">
                   <p className="text-muted mb-0">
-                    Don't have an account?{" "}
+                    Already have an account?{" "}
                     <Button
                       variant="link"
                       className="p-0 ms-1 text-decoration-none"
-                      onClick={() => navigate("/register")}
+                      onClick={() => navigate("/login")}
                     >
-                      Sign up here
+                      Login here
                     </Button>
                   </p>
                 </div>
-
                 {/* Back to Blog Link */}
                 <div className="text-center mt-3">
                   <Button
@@ -290,8 +314,6 @@ const Login = () => {
                 </div>
               </Card.Body>
             </Card>
-
-            {/* Additional Info */}
             <div className="text-center mt-4">
               <small className="text-white">
                 <i className="bi bi-shield-check me-2"></i>
@@ -305,4 +327,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

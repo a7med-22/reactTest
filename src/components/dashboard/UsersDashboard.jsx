@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -10,94 +11,31 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const UsersDashboard = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
 
-  // Mock users data
-  const users = [
-    {
-      id: 1,
-      name: "Ahmed Mohamed",
-      email: "ahmed@example.com",
-      role: "Admin",
-      status: "Active",
-      joined: "2024-01-15",
-      posts: 12,
-      lastLogin: "2024-03-20",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      role: "Editor",
-      status: "Active",
-      joined: "2024-02-10",
-      posts: 8,
-      lastLogin: "2024-03-19",
-    },
-    {
-      id: 3,
-      name: "Michael Chen",
-      email: "michael@example.com",
-      role: "Author",
-      status: "Active",
-      joined: "2024-01-20",
-      posts: 15,
-      lastLogin: "2024-03-18",
-    },
-    {
-      id: 4,
-      name: "David Wilson",
-      email: "david@example.com",
-      role: "Author",
-      status: "Inactive",
-      joined: "2024-02-05",
-      posts: 6,
-      lastLogin: "2024-03-10",
-    },
-    {
-      id: 5,
-      name: "Lisa Zhang",
-      email: "lisa@example.com",
-      role: "Editor",
-      status: "Active",
-      joined: "2024-03-01",
-      posts: 4,
-      lastLogin: "2024-03-20",
-    },
-    {
-      id: 6,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Author",
-      status: "Pending",
-      joined: "2024-03-15",
-      posts: 0,
-      lastLogin: "Never",
-    },
-    {
-      id: 7,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "Author",
-      status: "Active",
-      joined: "2024-02-28",
-      posts: 7,
-      lastLogin: "2024-03-19",
-    },
-    {
-      id: 8,
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      role: "Author",
-      status: "Suspended",
-      joined: "2024-01-10",
-      posts: 3,
-      lastLogin: "2024-03-05",
-    },
-  ];
+  // Fetch users from API
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/users");
+        setUsers(response.data);
+        setLoading(false);
+        toast.success(`Loaded ${response.data.length} users successfully!`);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        toast.error("Failed to load users data");
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -137,6 +75,22 @@ const UsersDashboard = () => {
     };
     return <Badge bg={roleColors[role] || "secondary"}>{role}</Badge>;
   };
+
+  if (loading) {
+    return (
+      <div
+        className="users-dashboard d-flex justify-content-center align-items-center"
+        style={{ minHeight: "400px" }}
+      >
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted">Loading users data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="users-dashboard">
@@ -288,9 +242,27 @@ const UsersDashboard = () => {
                 <tr key={user.id}>
                   <td className="py-3 px-4">
                     <div className="d-flex align-items-center">
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="rounded-circle me-3"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
+                        }}
+                      />
                       <div
                         className="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
-                        style={{ width: "40px", height: "40px" }}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          display: "none",
+                        }}
                       >
                         <i className="bi bi-person text-white"></i>
                       </div>

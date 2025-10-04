@@ -5,6 +5,7 @@ import {
   Navbar,
 } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const Nav = () => {
   const navigate = useNavigate();
@@ -12,14 +13,15 @@ const Nav = () => {
   const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // Don't show nav on login page
-  if (location.pathname === "/login") {
+  // Don't show nav on login or register page
+  if (location.pathname === "/login" || location.pathname === "/register") {
     return null;
   }
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("user");
+    toast.success("Logged out successfully!");
     navigate("/login");
   };
 

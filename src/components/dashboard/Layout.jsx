@@ -1,5 +1,6 @@
 import { Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const Layout = () => {
   const location = useLocation();
@@ -19,6 +20,10 @@ const Layout = () => {
     // Clear authentication data
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("user");
+
+    // Show logout toast
+    toast.success("Logged out successfully!");
+
     // Redirect to login
     navigate("/login");
   };
